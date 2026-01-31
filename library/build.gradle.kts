@@ -35,7 +35,7 @@ kotlin {
     }
 
     val iOSTargets = listOf(
-        iosX64(),
+        //iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     )
@@ -48,7 +48,7 @@ kotlin {
         val main by iosTarget.compilations.getting
         val archType = when (iosTarget.name) {
             "iosArm64" -> "ios-arm64" // Physical Device
-            "iosSimulatorArm64", "iosX64" -> "ios-arm64_x86_64-simulator" // Simulator
+            "iosSimulatorArm64" -> "ios-arm64_x86_64-simulator" // Simulator
             else -> throw GradleException("Unknown target: ${iosTarget.name}")
         }
 
@@ -143,13 +143,18 @@ signing {
 //    useInMemoryPgpKeys(System.getenv("SIGNING_KEY"), System.getenv("SIGNING_PASSWORD"))
 //    sign(publishing.publications)
 
-
+println("====> check signing credentials")
         val signingKey = providers.gradleProperty("signingInMemoryKey")
         val signingPassword = providers.gradleProperty("signingInMemoryKeyPassword")
 
+    println("====> signingKey present: ${signingKey.isPresent}")
+    println("====> signingPassword present: ${signingPassword.isPresent}")
+    println("====> signingKey value: ${signingKey.orNull?.take(10)?.plus("...")}")
+    println("====> signingPassword value: ${signingPassword.orNull?.take(10)?.plus("...")}")
+
         if (signingKey.isPresent && signingPassword.isPresent) {
             useInMemoryPgpKeys(signingKey.get(), signingPassword.get())
-            sign(publishing.publications["androidPublication"])
+            //sign(publishing.publications["androidPublication"])
             sign(publishing.publications)
             println("Signing credentials found and signed.")
         } else {

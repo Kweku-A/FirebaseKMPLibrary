@@ -6,7 +6,7 @@ on:
     types: [released, prereleased]
 jobs:
   publish:
-    name: Release build and publish
+    name: Release build and publish to mavenCentral
     runs-on: macOS-latest
     steps:
       - name: Check out code

@@ -15,7 +15,7 @@ version = "1.0.0"
 
 kotlin {
     androidLibrary {
-        namespace = "org.jetbrains.kotlinx.multiplatform.library.template"
+        namespace = "com.kweku.armah.iofirebase"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -110,7 +110,7 @@ mavenPublishing {
 
     signAllPublications()
 
-    coordinates("com.kweku.armah.firebase", "kmp.crashlytics", "0.0.1")
+    coordinates("com.kweku.armah.firebase", "kmp.crashlytics", "0.0.2")
 
     pom {
         name = "KMPCrashlyticsLibrary"

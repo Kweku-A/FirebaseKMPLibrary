@@ -1,4 +1,4 @@
-package com.kweku.armah.firebase.crashlytics
+package com.kweku.armah.iofirebase.crashlytics
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 

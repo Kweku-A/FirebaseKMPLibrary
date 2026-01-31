@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.vanniktech.mavenPublish)
+    id("maven-publish")
+    id("signing")
 }
 
 group = "io.github.kotlin"
@@ -106,33 +108,38 @@ tasks.withType<GenerateModuleMetadata> {
 mavenPublishing {
     publishToMavenCentral()
 
-   // signAllPublications()
+    signAllPublications()
 
     coordinates("com.kweku.armah.firebase", "kmp.crashlytics", "0.0.1")
 
     pom {
-        name = "FirebaseMultiplatformLibrary"
-        description = "A wrapper library for using Firebase in Kotlin Multiplatform Mobile projects with embedded Firebase frameworks"
+        name = "KMPCrashlyticsLibrary"
+        description = "A wrapper library for using Firebase Crashlytics"
         inceptionYear = "2025"
-        url = "https://github.com/kotlin/multiplatform-library-template/"
+        url = "https://github.com/Kweku-A/FirebaseKMPLibrary"
         licenses {
             license {
-                name = "XXX"
-                url = "YYY"
-                distribution = "ZZZ"
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
             }
         }
         developers {
             developer {
-                id = "XXX"
+                id = "b5e7ac49-7148-4b8e-adba-2cd175ed6edf"
                 name = "KwekuArmah"
-                url = "www.kwekuarmah.com"
+                url = "https://www.kwekuarmah.com"
             }
         }
         scm {
-            url = "XXX"
-            connection = "YYY"
-            developerConnection = "ZZZ"
+            url = "https://github.com/Kweku-A/FirebaseKMPLibrary.git"
+            connection = "scm:git:git://github.com/Kweku-A/FirebaseKMPLibrary.git"
+            developerConnection = "scm:git:ssh://git@github.com:Kweku-A/FirebaseKMPLibrary.git"
         }
     }
+}
+
+signing {
+    useInMemoryPgpKeys(System.getenv("SIGNING_KEY"), System.getenv("SIGNING_PASSWORD"))
+    sign(publishing.publications)
 }

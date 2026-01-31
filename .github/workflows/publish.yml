@@ -1,9 +1,10 @@
 # .github/workflows/publish.yml
 
 name: Publish
-on:
-  release:
-    types: [released, prereleased]
+#on:
+#  release:
+#    types: [released, prereleased]
+on: workflow_dispatch
 jobs:
   publish:
     name: Release build and publish to mavenCentral

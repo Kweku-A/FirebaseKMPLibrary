@@ -110,7 +110,7 @@ mavenPublishing {
 
     signAllPublications()
 
-    coordinates("com.kweku.armah.iofirebase", "kmp.crashlytics", "0.0.2")
+    coordinates("io.github.kweku-a", "kmp.crashlytics", "0.0.2")
 
     pom {
         name = "KMPCrashlyticsLibrary"

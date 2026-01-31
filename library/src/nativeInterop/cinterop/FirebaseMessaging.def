@@ -1,0 +1,5 @@
+language = Objective-C
+modules = FirebaseMessaging
+package = platform.firebase.messaging
+compilerOpts = -framework FirebaseMessaging
+linkerOpts = -framework FirebaseMessaging

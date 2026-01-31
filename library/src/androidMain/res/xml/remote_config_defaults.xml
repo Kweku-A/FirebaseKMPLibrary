@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<defaults>
+    <entry>
+        <key>drawer_navigation_items</key>
+        <value>
+            {"home":true,"church_service":true,"bacenta_service":true,"basonta_service":true,"church_members":true,"first_timers":true,"soul_tracker":true,"shepherding":true,"admin":false}
+        </value>
+    </entry>
+</defaults>

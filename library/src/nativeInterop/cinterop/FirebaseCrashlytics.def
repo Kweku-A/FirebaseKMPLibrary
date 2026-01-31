@@ -1,0 +1,5 @@
+language = Objective-C
+modules = FirebaseCrashlytics
+package = platform.firebase.crashlytics
+compilerOpts = -framework FirebaseCrashlytics
+linkerOpts = -framework FirebaseCrashlytics

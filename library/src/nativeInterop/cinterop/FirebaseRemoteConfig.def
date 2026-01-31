@@ -1,0 +1,5 @@
+language = Objective-C
+modules = FirebaseRemoteConfig
+package = platform.firebase.remoteconfig
+compilerOpts = -framework FirebaseRemoteConfig
+linkerOpts = -framework FirebaseRemoteConfig

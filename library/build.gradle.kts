@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.bundling.Zip
@@ -25,10 +24,10 @@ kotlin {
         }
 
         compilations.configureEach {
-            compilerOptions.configure {
-                jvmTarget.set(
-                    JvmTarget.JVM_11
-                )
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_11)
+                }
             }
         }
     }
@@ -39,8 +38,9 @@ kotlin {
         iosSimulatorArm64()
     )
 
-    val firebaseFrameworks =
-        listOf("FirebaseCrashlytics", "FirebaseMessaging", "FirebaseRemoteConfig")
+    val firebaseFrameworks = listOf(
+        "FirebaseCrashlytics",
+    )
 
     iOSTargets.forEach { iosTarget ->
         val main by iosTarget.compilations.getting
@@ -50,10 +50,11 @@ kotlin {
             else -> throw GradleException("Unknown target: ${iosTarget.name}")
         }
 
+        // Create cinterop definitions for Firebase frameworks
         firebaseFrameworks.forEach { frameworkName ->
             main.cinterops.create(frameworkName) {
                 val frameworkPath =
-                    "${project.rootDir}/library/src/iosMain/resources/files/firebase/$frameworkName/$frameworkName.xcframework/$archType"
+                    "${project.rootDir}/libs/firebase/$frameworkName/$frameworkName.xcframework/$archType"
 
                 // Tell the compiler WHERE the framework is and WHAT it is
                 compilerOpts("-F$frameworkPath", "-framework", frameworkName)
@@ -61,20 +62,24 @@ kotlin {
             }
         }
 
-        // 2. Dynamic Linker Configuration
+        // Configure the framework binary to embed Firebase
         iosTarget.binaries.framework {
-            baseName = "libxlsxwriter" // Or your shared library name
+            baseName = "KMPFirebase" // Your framework name
+            isStatic = true // Use static framework for better embedding
 
+            // Link Firebase frameworks
             firebaseFrameworks.forEach { frameworkName ->
                 val frameworkPath =
-                    "${project.rootDir}/library/src/iosMain/resources/files/firebase/$frameworkName/$frameworkName.xcframework/$archType"
+                    "${project.rootDir}/libs/firebase/$frameworkName/$frameworkName.xcframework/$archType"
 
                 linkerOpts("-F$frameworkPath", "-framework", frameworkName)
-                linkerOpts("-ObjC")
             }
 
             // Essential for static Firebase libraries to load categories/classes correctly
             linkerOpts("-ObjC")
+
+            // Additional linker options for proper embedding
+            linkerOpts("-all_load")
         }
     }
 
@@ -90,12 +95,12 @@ kotlin {
         androidMain.dependencies {
             api(project.dependencies.enforcedPlatform(libs.firebase.bom))
             api(libs.firebase.crashlytics)
-            api(libs.firebase.analytics)
-            api(libs.firebase.auth)
-            api(libs.firebase.config)
-            api(libs.firebase.messaging)
         }
     }
+}
+
+tasks.withType<GenerateModuleMetadata> {
+    suppressedValidationErrors.add("enforced-platform")
 }
 
 mavenPublishing {
@@ -103,11 +108,11 @@ mavenPublishing {
 
    // signAllPublications()
 
-    coordinates("com.kweku.armah", "kmpfirebase", "0.0.1")
+    coordinates("com.kweku.armah.firebase", "kmp.crashlytics", "0.0.1")
 
     pom {
         name = "FirebaseMultiplatformLibrary"
-        description = "A wrapper library for using Firebase in Kotlin Multiplatform Mobile projects"
+        description = "A wrapper library for using Firebase in Kotlin Multiplatform Mobile projects with embedded Firebase frameworks"
         inceptionYear = "2025"
         url = "https://github.com/kotlin/multiplatform-library-template/"
         licenses {
@@ -131,52 +136,3 @@ mavenPublishing {
         }
     }
 }
-
-tasks.withType<GenerateModuleMetadata> {
-    // The value 'enforced-platform' is provided in the validation
-    // error message you got
-    suppressedValidationErrors.add("enforced-platform")
-}
-
-// Package Firebase XCFrameworks for distribution
-val packageFirebaseXCFrameworks by tasks.registering(Zip::class) {
-    group = "publishing"
-    description = "Package Firebase XCFrameworks for iOS consumers"
-
-    val firebaseFrameworks = listOf("FirebaseCrashlytics", "FirebaseMessaging", "FirebaseRemoteConfig")
-
-    // Include all Firebase XCFrameworks
-    from(file("${project.rootDir}/library/src/iosMain/resources/files/firebase")) {
-        firebaseFrameworks.forEach { framework ->
-            include("$framework/$framework.xcframework/**")
-        }
-        // Also include Firebase.h and module.modulemap if they exist
-        include("Firebase.h")
-        include("module.modulemap")
-        include("README.md")
-        include("METADATA.md")
-    }
-
-    archiveBaseName.set("firebase-ios-frameworks")
-    archiveVersion.set(version.toString())
-    archiveClassifier.set("xcframeworks")
-    destinationDirectory.set(layout.buildDirectory.dir("outputs/firebase"))
-}
-
-// Attach Firebase frameworks zip to all maven publications
-afterEvaluate {
-    publishing {
-        publications.withType<MavenPublication> {
-            artifact(packageFirebaseXCFrameworks) {
-                classifier = "xcframeworks"
-                extension = "zip"
-            }
-        }
-    }
-}
-
-// Ensure publish tasks build the Firebase frameworks package first
-tasks.matching { it.name.startsWith("publish") || it.name.startsWith("upload") }.configureEach {
-    dependsOn(packageFirebaseXCFrameworks)
-}
-

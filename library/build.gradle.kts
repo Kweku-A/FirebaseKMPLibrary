@@ -140,6 +140,20 @@ mavenPublishing {
 }
 
 signing {
-    useInMemoryPgpKeys(System.getenv("SIGNING_KEY"), System.getenv("SIGNING_PASSWORD"))
-    sign(publishing.publications)
+//    useInMemoryPgpKeys(System.getenv("SIGNING_KEY"), System.getenv("SIGNING_PASSWORD"))
+//    sign(publishing.publications)
+
+
+        val signingKey = providers.gradleProperty("signingInMemoryKey")
+        val signingPassword = providers.gradleProperty("signingInMemoryKeyPassword")
+
+        if (signingKey.isPresent && signingPassword.isPresent) {
+            useInMemoryPgpKeys(signingKey.get(), signingPassword.get())
+            sign(publishing.publications["androidPublication"])
+            sign(publishing.publications)
+            println("Signing credentials found and signed.")
+        } else {
+            println("Signing credentials not found. Skipping signing.")
+        }
+
 }
